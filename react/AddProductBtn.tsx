@@ -352,6 +352,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
           onClick={handleAddProductClick}
           isLoading={loading || addLoading || removeLoading}
         >
+          <span>Hello</span>
           <span
             className={`${handles.wishlistIcon} ${
               checkFill() ? styles.fill : styles.outline
