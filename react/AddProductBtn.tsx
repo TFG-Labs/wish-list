@@ -11,7 +11,8 @@ import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
-import { Button, ToastContext } from 'vtex.styleguide'
+import { ToastContext } from 'vtex.styleguide'
+import {WishlistButton} from 'tfgroup.custom-design-system'
 import { useRuntime, NoSSR } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
 import { usePixel } from 'vtex.pixel-manager'
@@ -21,7 +22,6 @@ import storageFactory from './utils/storage'
 import checkItem from './queries/checkItem.gql'
 import addToList from './queries/addToList.gql'
 import removeFromList from './queries/removeFromList.gql'
-import styles from './styles.css'
 
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
@@ -346,19 +346,13 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
 
   return (
     <NoSSR>
-      <div className={handles.wishlistIconContainer}>
-        <Button
-          variation="tertiary"
+      <div className={handles.wishlistIconContainer} >
+        <WishlistButton 
           onClick={handleAddProductClick}
-          isLoading={loading || addLoading || removeLoading}
-        >
-          <span>Hello</span>
-          <span
-            className={`${handles.wishlistIcon} ${
-              checkFill() ? styles.fill : styles.outline
-            } ${styles.iconSize}`}
+          loading={loading || addLoading || removeLoading} 
+          filled={checkFill() ? true : false}
           />
-        </Button>
+
       </div>
     </NoSSR>
   )

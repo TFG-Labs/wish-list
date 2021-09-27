@@ -1,6 +1,8 @@
 {
   "stack": "dotnet",
   "memory": 256,
+  "minReplicas": 1,
+  "maxReplicas": 5,
   "runtimeArgs": [
   ],
   "routes": {
