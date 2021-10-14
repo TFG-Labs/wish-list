@@ -1,7 +1,7 @@
 {
   "name": "wish-list",
-  "vendor": "vtex",
-  "version": "1.9.2",
+  "vendor": "tfgroup",
+  "version": "0.0.0",
   "title": "Wish List",
   "description": "The Wishlist app is designed for B2C. It adds a heart icon to the Shelfs and Product Page, so the user can add it to the Wishlist, you can list all the Wishlisted items at /wishlist",
   "categories": [],
@@ -40,7 +40,8 @@
     "vtex.styleguide": "9.x",
     "vtex.my-account": "1.x",
     "vtex.my-account-commons": "1.x",
-    "vtex.pixel-manager": "1.x"
+    "vtex.pixel-manager": "1.x",
+    "tfgroup.custom-design-system": "0.x"
   },
   "policies": [
     {
