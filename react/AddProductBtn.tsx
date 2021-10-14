@@ -11,7 +11,8 @@ import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
-import { Button, ToastContext } from 'vtex.styleguide'
+import { ToastContext } from 'vtex.styleguide'
+import { OutlinedButton } from 'tfgroup.custom-design-system'
 import { useRuntime, NoSSR } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
 import { usePixel } from 'vtex.pixel-manager'
@@ -344,20 +345,20 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
     localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
   }
 
+
+  const filled = checkFill() ? true : false;
+
   return (
     <NoSSR>
-      <div className={handles.wishlistIconContainer}>
-        <Button
-          variation="tertiary"
+      <div className={handles.wishlistIconContainer} >
+        <OutlinedButton 
+          block
           onClick={handleAddProductClick}
-          isLoading={loading || addLoading || removeLoading}
+          loading={loading || addLoading || removeLoading} 
+
         >
-          <span
-            className={`${handles.wishlistIcon} ${
-              checkFill() ? styles.fill : styles.outline
-            } ${styles.iconSize}`}
-          />
-        </Button>
+        {filled  ? 'REMOVE FROM WISHLIST' : 'ADD TO WISHLIST'}
+        </OutlinedButton>
       </div>
     </NoSSR>
   )
