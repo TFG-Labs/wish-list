@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.9.2] - 2021-09-29
+
+### Added
+- I18n bg
+
+### Fixed
+- I18n ro
+
+## [1.9.1] - 2021-09-28
+
+### Fixed
+- I18n en, es, fr, it, ja, ko, nl, pt and ro
+
 ## [1.9.0] - 2021-08-31
 
 ### Feature

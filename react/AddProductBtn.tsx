@@ -11,8 +11,8 @@ import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
-import { ToastContext } from 'vtex.styleguide'
-import {WishlistButton} from 'tfgroup.custom-design-system'
+import { ToastContext, Button } from 'vtex.styleguide'
+import { OutlinedButton } from 'tfgroup.vtex-tfg-custom-components'
 import { useRuntime, NoSSR } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
 import { usePixel } from 'vtex.pixel-manager'
@@ -26,8 +26,11 @@ import removeFromList from './queries/removeFromList.gql'
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 
+type ButtonType = "ICON" | "ICON_WITH_TEXT" 
+
 type AddBtnProps = {
-  toastURL: string
+  toastURL: string,
+  buttonType: ButtonType
 }
 
 let isAuthenticated =
@@ -113,7 +116,7 @@ const addWishlisted = (productId: any) => {
 }
 
 
-const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
+const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="ICON" }) => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
@@ -346,14 +349,38 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist' }) => {
 
   return (
     <NoSSR>
-      <div className={handles.wishlistIconContainer} >
-        <WishlistButton 
-          onClick={handleAddProductClick}
-          loading={loading || addLoading || removeLoading} 
-          filled={checkFill() ? true : false}
-          />
+      {buttonType === "ICON" ? 
 
-      </div>
+          // STANDARD VTEX HEART ICON BUTTON
+        (<div className={handles.wishlistIconContainer}>
+          <Button
+            variation="tertiary"
+            onClick={handleAddProductClick}
+            isLoading={loading || addLoading || removeLoading}
+          >
+            <span
+              className={`${handles.wishlistIcon} ${
+                checkFill() ? styles.fill : styles.outline
+              } ${styles.iconSize}`}
+            />
+          </Button>
+        </div>) 
+        
+        : 
+
+          // TFG WISHLIST BUTTON 
+        (<div className={handles.wishlistIconContainer} >
+          <OutlinedButton 
+            block
+            onClick={handleAddProductClick}
+            loading={loading || addLoading || removeLoading} 
+
+          >
+          {checkFill()  ? 'REMOVE FROM WISHLIST' : 'ADD TO WISHLIST'}
+          </OutlinedButton>
+        </div>
+        )
+      }
     </NoSSR>
   )
 }
