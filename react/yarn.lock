@@ -4664,9 +4664,9 @@ test-exclude@^5.2.3:
     read-pkg-up "^4.0.0"
     require-main-filename "^2.0.0"
 
-"tfgroup.vtex-tfg-custom-components@https://shaheentwo--tfgroup.myvtex.com/_v/private/typings/linked/v1/tfgroup.vtex-tfg-custom-components@0.0.0+build1636360179/public/@types/tfgroup.vtex-tfg-custom-components":
-  version "0.0.0"
-  resolved "https://shaheentwo--tfgroup.myvtex.com/_v/private/typings/linked/v1/tfgroup.vtex-tfg-custom-components@0.0.0+build1636360179/public/@types/tfgroup.vtex-tfg-custom-components#7a0f9ed31fb71349f373b76cd50742a5ecd24c65"
+"tfgroup.vtex-tfg-custom-components@http://tfgroup.vtexassets.com/_v/public/typings/v1/tfgroup.vtex-tfg-custom-components@1.1.0/public/@types/tfgroup.vtex-tfg-custom-components":
+  version "1.1.0"
+  resolved "http://tfgroup.vtexassets.com/_v/public/typings/v1/tfgroup.vtex-tfg-custom-components@1.1.0/public/@types/tfgroup.vtex-tfg-custom-components#f5272a668c5c51aee0161d59e30efe4d41fda8a9"
 
 throat@^4.0.0:
   version "4.1.0"
@@ -4864,10 +4864,6 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-"vtex.add-to-cart-button@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.add-to-cart-button@0.26.13/public/@types/vtex.add-to-cart-button":
-  version "0.26.13"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.add-to-cart-button@0.26.13/public/@types/vtex.add-to-cart-button#d68159aab662f6c1a1aabfa35bf6085ac0d59a36"
-
 "vtex.css-handles@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.css-handles@0.4.4/public/@types/vtex.css-handles":
   version "0.4.4"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.css-handles@0.4.4/public/@types/vtex.css-handles#8c45c6decf9acd2b944e07261686decff93d6422"
@@ -4884,9 +4880,9 @@ verror@1.10.0:
   version "1.6.0"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.my-account-commons@1.6.0/public/@types/vtex.my-account-commons#3715228fb82e81e955e6a90d11e7975e72b37b2e"
 
-"vtex.my-account@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.my-account@1.23.0/public/@types/vtex.my-account":
-  version "1.23.0"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.my-account@1.23.0/public/@types/vtex.my-account#76950a27e64cdf453fbf86ecc321a5df3e015491"
+"vtex.my-account@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.my-account@1.24.0/public/@types/vtex.my-account":
+  version "1.24.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.my-account@1.24.0/public/@types/vtex.my-account#f1dfdcedd359e5716d30f4765181bd52a90b37d8"
 
 "vtex.pixel-manager@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.pixel-manager@1.8.0/public/@types/vtex.pixel-manager":
   version "1.8.0"
