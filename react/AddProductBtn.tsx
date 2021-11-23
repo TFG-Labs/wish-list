@@ -13,6 +13,7 @@ import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
 import { ToastContext, Button } from 'vtex.styleguide'
 import { OutlinedButton } from 'tfgroup.vtex-tfg-custom-components'
+import styles from "./styles.css";
 import { useRuntime, NoSSR } from 'vtex.render-runtime'
 import { useCssHandles } from 'vtex.css-handles'
 import { usePixel } from 'vtex.pixel-manager'
