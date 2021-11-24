@@ -4664,9 +4664,9 @@ test-exclude@^5.2.3:
     read-pkg-up "^4.0.0"
     require-main-filename "^2.0.0"
 
-"tfgroup.vtex-tfg-custom-components@http://tfgroup.vtexassets.com/_v/public/typings/v1/tfgroup.vtex-tfg-custom-components@1.1.0/public/@types/tfgroup.vtex-tfg-custom-components":
-  version "1.1.0"
-  resolved "http://tfgroup.vtexassets.com/_v/public/typings/v1/tfgroup.vtex-tfg-custom-components@1.1.0/public/@types/tfgroup.vtex-tfg-custom-components#f5272a668c5c51aee0161d59e30efe4d41fda8a9"
+"tfgroup.wish-list@http://tfgroup.vtexassets.com/_v/public/typings/v1/tfgroup.wish-list@0.0.2/public/@types/tfgroup.wish-list":
+  version "0.0.2"
+  resolved "http://tfgroup.vtexassets.com/_v/public/typings/v1/tfgroup.wish-list@0.0.2/public/@types/tfgroup.wish-list#51953eeb58da3977ba11920b3fa3735883e5b6a4"
 
 throat@^4.0.0:
   version "4.1.0"
@@ -4864,6 +4864,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+"vtex.add-to-cart-button@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.add-to-cart-button@0.26.13/public/@types/vtex.add-to-cart-button":
+  version "0.26.13"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.add-to-cart-button@0.26.13/public/@types/vtex.add-to-cart-button#d68159aab662f6c1a1aabfa35bf6085ac0d59a36"
+
 "vtex.css-handles@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.css-handles@0.4.4/public/@types/vtex.css-handles":
   version "0.4.4"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.css-handles@0.4.4/public/@types/vtex.css-handles#8c45c6decf9acd2b944e07261686decff93d6422"
@@ -4896,6 +4900,10 @@ verror@1.10.0:
   version "0.4.0"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.product-list-context@0.4.0/public/@types/vtex.product-list-context#79bff31f1baa7da07327a2075170520758d55ef5"
 
+"vtex.product-quantity@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.product-quantity@1.7.1/public/@types/vtex.product-quantity":
+  version "1.7.1"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.product-quantity@1.7.1/public/@types/vtex.product-quantity#8c80c2f59f77b50b226f3e82e71e5ee511dc2e0c"
+
 "vtex.product-specification-badges@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.product-specification-badges@0.3.0/public/@types/vtex.product-specification-badges":
   version "0.3.0"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.product-specification-badges@0.3.0/public/@types/vtex.product-specification-badges#2df6b189acfabf642504df02d7b8ad406ee90c07"
@@ -4920,9 +4928,9 @@ verror@1.10.0:
   version "0.22.0"
   resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.slider-layout@0.22.0/public/@types/vtex.slider-layout#d0e9ce16b9f9ea2bcc50a3cc42c5466d565141c0"
 
-"vtex.store-graphql@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.147.4/public/@types/vtex.store-graphql":
-  version "2.147.4"
-  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.147.4/public/@types/vtex.store-graphql#8340064d04c59b01d1b4053b3fba671552199660"
+"vtex.store-graphql@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.148.0/public/@types/vtex.store-graphql":
+  version "2.148.0"
+  resolved "http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-graphql@2.148.0/public/@types/vtex.store-graphql#b81ca49db216fa89bab8ee4898f7d8756165d496"
 
 "vtex.store-icons@http://vtex.vtexassets.com/_v/public/typings/v1/vtex.store-icons@0.18.0/public/@types/vtex.store-icons":
   version "0.18.0"

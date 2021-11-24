@@ -40,8 +40,7 @@
     "vtex.styleguide": "9.x",
     "vtex.my-account": "1.x",
     "vtex.my-account-commons": "1.x",
-    "vtex.pixel-manager": "1.x",
-    "tfgroup.vtex-tfg-custom-components": "1.x"
+    "vtex.pixel-manager": "1.x"
   },
   "policies": [
     {
