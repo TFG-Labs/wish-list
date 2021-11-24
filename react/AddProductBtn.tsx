@@ -22,6 +22,7 @@ import storageFactory from './utils/storage'
 import checkItem from './queries/checkItem.gql'
 import addToList from './queries/addToList.gql'
 import removeFromList from './queries/removeFromList.gql'
+import styles from './styles.css'
 
 const localStore: any = storageFactory(() => sessionStorage)
 const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
