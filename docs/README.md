@@ -1,3 +1,10 @@
+# TFG Specifics
+This repo has been forked to allow TFG to customize the wishlist 
+
+[TFG VTEX Developer Guide](https://tfginfotec.atlassian.net/wiki/spaces/LABSPLAT/pages/1693483009/VTEX+Developer+Guide)
+
+---
+
 📢 Use this project, [contribute](https://github.com/vtex-apps/wish-list) to it or open issues to help evolve it using [Store Discussion](https://github.com/vtex-apps/store-discussion).
 
 # Wishlist
