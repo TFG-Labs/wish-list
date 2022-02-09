@@ -7,7 +7,7 @@ import React, {
   useEffect,
   SyntheticEvent,
 } from 'react'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from 'react-apollo'
 import { defineMessages, useIntl } from 'react-intl'
 import { ProductContext } from 'vtex.product-context'
@@ -30,7 +30,7 @@ const CSS_HANDLES = ['wishlistIconContainer', 'wishlistIcon'] as const
 type ButtonType = "ICON" | "ICON_WITH_TEXT" 
 
 type AddBtnProps = {
-  toastURL: string,
+  toastURL?: string,
   buttonType: ButtonType
 }
 
@@ -42,7 +42,7 @@ let wishListed: any =
   JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
 const productCheck: {
-  [key: string]: { isWishlisted: boolean; wishListId: string }
+  [key: string]: { isWishlisted: boolean; wishListId: string; sku: string }
 } = {}
 const defaultValues = {
   LIST_NAME: 'Wishlist',
@@ -100,24 +100,31 @@ const useSessionResponse = () => {
   return session
 }
 
-const unify = (arr: any) => {
-  const obj: any = {}
-  for (let i = 0; i < arr.length; i++) {
-    obj[arr[i]] = true
+const addWishlisted = (productId: any, sku: any) => {
+  if (
+    wishListed.find(
+      (item: any) =>
+        item.productId &&
+        item.sku &&
+        item.productId === productId &&
+        item.sku === sku
+    ) === undefined
+  ) {
+    wishListed.push({
+      productId,
+      sku,
+    })
   }
-  return Object.getOwnPropertyNames(obj)
+  saveToLocalStorageItem(wishListed)
 }
 
-const addWishlisted = (productId: any) => {
-  if (wishListed.indexOf(productId) === -1) {
-    wishListed.push(productId)
-  }
-  wishListed = unify(wishListed)
-  localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
+const saveToLocalStorageItem = (data: any): any => {
+  localStore.setItem('wishlist_wishlisted', JSON.stringify(data))
+  return data
 }
 
 
-const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="ICON" }) => {
+const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist', buttonType="ICON" }) => {
   const intl = useIntl()
   const [state, setState] = useState<any>({
     isLoading: true,
@@ -133,17 +140,14 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
           productCheck[productId] = {
             isWishlisted: false,
             wishListId: '',
+            sku: '',
           }
         }
 
-        wishListed = unify(wishListed)
-
-        const pos = wishListed.findIndex((item: string) => item === productId)
-
-        if (pos !== -1) {
-          wishListed.splice(pos, 1)
-          localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
-        }
+        wishListed = wishListed.filter(
+          (item: any) => !(item.productId === productId && item.sku === sku)
+        )
+        saveToLocalStorageItem(wishListed)
 
         setState({
           ...state,
@@ -161,6 +165,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem)
 
   const [productId] = String(product?.productId).split('-')
+  const sku = product?.sku?.itemId
+  wishListed = JSON.parse(localStore.getItem('wishlist_wishlisted')) ?? []
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
     let action: any
@@ -200,8 +206,9 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
         productCheck[productId] = {
           wishListId: res.addToList,
           isWishlisted: true,
+          sku,
         }
-        addWishlisted(productId)
+        addWishlisted(productId, sku)
         toastMessage('productAddedToList', toastURL)
       },
     }
@@ -223,7 +230,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
     localStore.setItem('wishlist_shopperId', String(shopperId))
     if (!isAuthenticated && !shopperId) {
       if (localStore.getItem('wishlist_wishlisted')) {
-        localStore.removeItem('wishlist_wishlisted',)
+        localStore.removeItem('wishlist_wishlisted')
       }
     }
   }
@@ -265,17 +272,19 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
         variables: {
           shopperId: String(shopperId),
           productId,
+          sku,
         },
       })
     }
   }
+
   const checkFill = () => {
-    return (
-      sessionResponse?.namespaces?.profile?.isAuthenticated?.value === "false" ? false :
-      (wishListed.findIndex((item: string) => item === productId) !== -1 ||
-      productCheck[productId]?.isWishlisted ||
-      isWishlistPage)
-    )
+    return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
+      'false'
+      ? false
+      : wishListed.find(
+          (item: any) => item.productId === productId && item.sku === sku
+        ) !== undefined
   }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
@@ -287,8 +296,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
         items: {
           product,
           selectedItem,
-          account
-        }
+          account,
+        },
       }
 
       if (checkFill()) {
@@ -306,7 +315,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
             listItem: {
               productId,
               title: product.productName,
-              sku: selectedItem.itemId
+              sku: selectedItem.itemId,
             },
             shopperId,
             name: defaultValues.LIST_NAME,
@@ -314,11 +323,11 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
         })
         pixelEvent.event = 'addToWishlist'
       }
-      
+
       push(pixelEvent)
     } else {
       localStore.setItem('wishlist_addAfterLogin', String(productId))
-      toastMessage('notLogged',toastURL)
+      toastMessage('notLogged', toastURL)
     }
   }
 
@@ -334,18 +343,17 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
     productCheck[productId] = {
       isWishlisted: data.checkList.inList,
       wishListId: itemWishListId,
+      sku,
     }
 
-    if (data.checkList.inList && wishListed.indexOf(productId) === -1) {
-      addWishlisted(productId)
+    if (
+      data.checkList.inList &&
+      wishListed.find(
+        (item: any) => item.productId === productId && item.sku === sku
+      ) === undefined
+    ) {
+      addWishlisted(productId, sku)
     }
-  } else if (
-    data?.checkList?.inList === false &&
-    wishListed.length !== 0 && wishListed.indexOf(productId) !== -1
-  ) {
-    const indexWishListed = wishListed.indexOf(productId)
-    wishListed.splice(indexWishListed, 1)
-    localStore.setItem('wishlist_wishlisted', JSON.stringify(wishListed))
   }
 
   return (
@@ -386,8 +394,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL='/account/#wishlist', buttonType="IC
   )
 }
 
-AddBtn.propTypes = {
-  toastURL: PropTypes.string.isRequired,
-}
+// AddBtn.propTypes = {
+//   toastURL: PropTypes.string.isRequired,
+// }
 
 export default AddBtn
