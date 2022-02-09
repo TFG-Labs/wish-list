@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useMemo, useState, useEffect, FC } from 'react'
 import { useLazyQuery } from 'react-apollo'
 // @ts-expect-error - useTreePath is a private API
@@ -5,16 +6,17 @@ import { ExtensionPoint, useRuntime, useTreePath } from 'vtex.render-runtime'
 import { useListContext, ListContextProvider } from 'vtex.list-context'
 import { ProductListContext } from 'vtex.product-list-context'
 import { Spinner } from 'vtex.styleguide'
+import { usePixel } from 'vtex.pixel-manager'
+import { FormattedMessage } from 'react-intl'
 
 import { mapCatalogProductToProductSummary } from './utils/normalize'
 import ProductListEventCaller from './components/ProductListEventCaller'
 import productsQuery from './queries/productById.gql'
 import ViewLists from './queries/viewLists.gql'
 import { getSession } from './modules/session'
-import storageFactory from './utils/storage';
-import { FormattedMessage } from 'react-intl'
+import storageFactory from './utils/storage'
 
-const localStore = storageFactory(() => localStorage)
+const localStore = storageFactory(() => sessionStorage)
 
 let isAuthenticated =
   JSON.parse(String(localStore.getItem('wishlist_isAuthenticated'))) ?? false
@@ -40,17 +42,20 @@ const useSessionResponse = () => {
 }
 
 interface ProductSummaryProps {
-  children?: any,
+  children?: any
   showViewEmptyList?: boolean
+  backButton?: boolean
+  title?: string
 }
 
-const ProductSummaryList: FC<ProductSummaryProps> = ({ 
+const ProductSummaryList: FC<ProductSummaryProps> = ({
   children,
-  showViewEmptyList = false
+  showViewEmptyList = false,
 }) => {
   const { list } = useListContext() || []
   const { treePath } = useTreePath()
   const { navigate, history } = useRuntime()
+  const { push } = usePixel()
 
   const sessionResponse: any = useSessionResponse()
 
@@ -66,6 +71,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
     productsQuery,
     {
       ssr: false,
+      fetchPolicy: 'network-only',
     }
   )
 
@@ -87,14 +93,17 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
       })
     }
   }
-
-  if (!called && dataLists) {
-    const ids = dataLists?.viewLists[0]?.data.map((item: any) => {
-      const [id] = item.productId.split('-')
-      return id
-    })
-
-    localStore.setItem('wishlist_wishlisted', JSON.stringify(ids))
+  let productList = [] as any
+  productList = dataLists?.viewLists[0]?.data.map((item: any) => {
+    const [id] = item.productId.split('-')
+    return {
+      productId: id,
+      sku: item.sku,
+    }
+  })
+  if (!called && dataLists && productList) {
+    const ids = productList.map((item: any) => item.productId)
+    localStore.setItem('wishlist_wishlisted', JSON.stringify(productList))
     loadProducts({
       variables: {
         ids,
@@ -106,38 +115,67 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
 
   const newListContextValue = useMemo(() => {
     const getWishlistId = (productId: string) => {
-      const [id] = productId.split('-')
-      return dataLists?.viewLists[0]?.data.find((item: any) => {
-        const [itemId] = item.productId.split('-')
-        return itemId === id
-      })?.id
-    }
-    const componentList = products?.map((product: any, index: any) => {
-      const sku = dataLists?.viewLists[0]?.data[index]?.sku
-      const items = data?.productsByIdentifier[index]?.items
-
-      const normalizedProduct = mapCatalogProductToProductSummary(
-        product,
-        getWishlistId(product.productId)
-      )
-      if (sku && items.length) {
-        for (const item of items) {
-          if (item.itemId === sku) {
-            normalizedProduct.sku.image = item.images[0]
-          }
-        }
+      if (productId) {
+        const [id] = productId.split('-')
+        return dataLists?.viewLists[0]?.data.find((item: any) => {
+          const [itemId] = item.productId.split('-')
+          return itemId === id
+        })?.id
       }
-      return (
-        <ExtensionPoint
-          id="product-summary"
-          key={product.id}
-          treePath={treePath}
-          product={normalizedProduct}
-        />
-      )
-    })
+      return null
+    }
+    let newProductList = []
+    if (productList) {
+      newProductList = productList
+        .map((_product: any) => {
+          if (products) {
+            const product = products.find(
+              (item: any) =>
+                item.productId === _product.productId &&
+                item.items &&
+                item.items.find((sku: any) => sku.itemId === _product.sku)
+            )
+            const _sku = product?.items.find(
+              (sku: any) => sku.itemId === _product.sku
+            )
+            return { ...product, sku: _sku }
+          }
+          return undefined
+        })
+        .filter((item: any) => item !== undefined)
+    }
+
+    const componentList = newProductList
+      ?.filter((item: any) => item.sku && item.productId)
+      ?.map((product: any, index: number) => {
+        const position = index + 1
+
+        const normalizedProduct = mapCatalogProductToProductSummary(
+          product,
+          getWishlistId(product.productId)
+        )
+
+        const handleOnClick = () => {
+          push({
+            event: 'productClick',
+            list: 'wishlist',
+            product: normalizedProduct,
+            position,
+          })
+        }
+
+        return (
+          <ExtensionPoint
+            id="product-summary"
+            key={product?.sku?.itemId}
+            treePath={treePath}
+            product={normalizedProduct}
+            actionOnClick={handleOnClick}
+          />
+        )
+      })
     return list.concat(componentList)
-  }, [products, treePath, list, dataLists])
+  }, [products, treePath, list, dataLists, productList, push])
 
   if (sessionResponse && !isAuthenticated) {
     navigate({
@@ -151,26 +189,17 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
   }
 
   if (!dataLists || !data || error) {
-    if (error && error?.message?.includes('products') && showViewEmptyList) {
-      return (
-        <ExtensionPoint
-          id="wishlist-empty-list"
-        />
-      )
+    if (error?.message?.includes('products') && showViewEmptyList) {
+      return <ExtensionPoint id="wishlist-empty-list" />
     }
     return null
   }
 
   if (listCalled && !listLoading && !dataLists?.viewLists[0]?.data?.length) {
     if (showViewEmptyList) {
-      return (
-        <ExtensionPoint
-          id="wishlist-empty-list"
-        />
-      )
-    } else {
-      return <FormattedMessage id="store/myaccount-empty-list" />
+      return <ExtensionPoint id="wishlist-empty-list" />
     }
+    return <FormattedMessage id="store/myaccount-empty-list" />
   }
 
   return (
@@ -181,7 +210,7 @@ const ProductSummaryList: FC<ProductSummaryProps> = ({
 }
 
 const EnhancedProductList: FC<ProductSummaryProps> = props => {
-  const { children, showViewEmptyList } = props;
+  const { children, showViewEmptyList } = props
   const { ProductListProvider } = ProductListContext
   return (
     <ProductListProvider listName="wishlist">
