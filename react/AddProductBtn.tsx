@@ -260,6 +260,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist', buttonType="
           listItem: {
             productId,
             title: product.productName,
+            sku: selectedItem.itemId,
           },
           shopperId,
           name: defaultValues.LIST_NAME,
@@ -282,9 +283,8 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist', buttonType="
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       'false'
       ? false
-      : wishListed.find(
-          (item: any) => item.productId === productId && item.sku === sku
-        ) !== undefined
+      : wishListed.find((item: any) => item.productId === productId) !==
+          undefined
   }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
