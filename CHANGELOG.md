@@ -7,7 +7,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [0.0.4] - 2022-02-18
+## [1.11.3] - 2022-03-14
+
+### Fixed
+
+- Fix favorited check and stop duplicate item added to same list
+
+## [1.11.2] - 2022-03-02
+
+### Fixed
+
+- Fix products added to wishlist before logging in are not displayed
+
+## [1.11.1] - 2022-03-01
+### Added
+
+- Added URL information in README file for the user
+
+## [1.11.0] - 2022-02-25
+
+### Fixed
+
+- Fix the api for downloading all the wishlist records
 
 ## [1.10.0] - 2022-01-28
 
