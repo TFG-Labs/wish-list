@@ -2,6 +2,7 @@
   "store/wishlist.addButton": "リストに追加",
   "store/wishlist-see-lists": "リストを表示",
   "store/wishlist-product-added-to-list": "リストに追加された製品",
+  "store/wishlist-product-removed-from-list": "ウィッシュリストから削除しました",
   "store/wishlist-add-product-fail": "製品をリストに追加できませんでした",
   "store/wishlist-default-list-name": "ウィッシュリスト",
   "store/myaccount-menu": "ウィッシュリスト",
