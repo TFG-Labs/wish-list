@@ -205,8 +205,7 @@ const AddBtn: FC<AddBtnProps> = ({
 
     showToast({
       message: intl.formatMessage(messages[messsageKey]),
-      action,
-      duration: Infinity,
+      action
     });
   };
 
