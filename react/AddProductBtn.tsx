@@ -376,6 +376,12 @@ const AddBtn: FC<AddBtnProps> = ({
     .lh-copy {
       margin-left: 18px
     }
+    .vtex-alert__close-icon {
+      display: none
+    }
+    .vtex-toast, .vtex-button__label {
+      padding-right: 16px
+    }
     `
 
   return (
