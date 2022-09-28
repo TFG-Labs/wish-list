@@ -365,7 +365,7 @@ const AddBtn: FC<AddBtnProps> = ({ toastURL = '/account/#wishlist', buttonType="
           <Button
             variation="tertiary"
             onClick={handleAddProductClick}
-            isLoading={loading || addLoading || removeLoading}
+            isLoading={addLoading || removeLoading}
           >
             <span
               className={`${handles.wishlistIcon} ${
