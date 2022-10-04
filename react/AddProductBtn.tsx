@@ -7,7 +7,6 @@ import React, {
   useEffect,
   SyntheticEvent,
 } from "react";
-// import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from "react-apollo";
 import { defineMessages, useIntl } from "react-intl";
 import { ProductContext } from "vtex.product-context";
@@ -389,9 +388,5 @@ const AddBtn: FC<AddBtnProps> = ({
     </NoSSR>
   );
 };
-
-// AddBtn.propTypes = {
-//   toastURL: PropTypes.string.isRequired,
-// }
 
 export default AddBtn;
