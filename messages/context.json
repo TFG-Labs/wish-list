@@ -2,6 +2,7 @@
   "store/wishlist.addButton": "store/wishlist.addButton",
   "store/wishlist-see-lists": "store/wishlist-see-lists",
   "store/wishlist-product-added-to-list": "store/wishlist-product-added-to-list",
+  "store/wishlist-product-removed-from-list": "store/wishlist-product-removed-from-list",
   "store/wishlist-add-product-fail": "store/wishlist-add-product-fail",
   "store/wishlist-default-list-name": "store/wishlist-default-list-name",
   "store/myaccount-menu": "store/myaccount-menu",
