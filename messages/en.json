@@ -1,7 +1,8 @@
 {
   "store/wishlist.addButton": "Add to the list",
-  "store/wishlist-see-lists": "See lists",
-  "store/wishlist-product-added-to-list": "Product added to the list",
+  "store/wishlist-see-lists": "VIEW WISHLIST",
+  "store/wishlist-product-added-to-list": "Added to wishlist",
+  "store/wishlist-product-removed-from-list": "Removed from wishlist",
   "store/wishlist-add-product-fail": "Couldn't add product to the list",
   "store/wishlist-default-list-name": "Wishlist",
   "store/myaccount-menu": "Wishlist",

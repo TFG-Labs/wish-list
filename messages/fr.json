@@ -2,6 +2,7 @@
   "store/wishlist.addButton": "Ajouter à la liste",
   "store/wishlist-see-lists": "Afficher les listes",
   "store/wishlist-product-added-to-list": "Produit ajouté à la liste",
+  "store/wishlist-product-removed-from-list": "Supprimé de la liste de souhaits",
   "store/wishlist-add-product-fail": "Impossible d'ajouter le produit à la liste",
   "store/wishlist-default-list-name": "Liste de préférences",
   "store/myaccount-menu": "Liste de préférences",

@@ -1,7 +1,8 @@
 {
   "store/wishlist.addButton": "Toevoegen aan de lijst",
   "store/wishlist-see-lists": "Zie lijsten",
-  "store/wishlist-product-added-to-list": "Product toegevoegd aan de lijst",
+  "store/wishlist-product-added-to-list": "toegevoegd aan de lijst",
+  "store/wishlist-product-removed-from-list": "Verwijderd van verlanglijst",
   "store/wishlist-add-product-fail": "Kan product niet toevoegen aan de lijst",
   "store/wishlist-default-list-name": "Verlanglijst",
   "store/myaccount-menu": "Verlanglijst",

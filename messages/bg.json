@@ -2,6 +2,7 @@
   "store/wishlist.addButton": "Добавяне към списъка",
   "store/wishlist-see-lists": "Вижте списъците",
   "store/wishlist-product-added-to-list": "Продуктът е добавен към списъка",
+  "store/wishlist-product-removed-from-list": "Премахнато от списъка с желания",
   "store/wishlist-add-product-fail": "Продуктът не можа да бъде добавен към списъка",
   "store/wishlist-default-list-name": "Списък с желания",
   "store/myaccount-menu": "Списък с желания",

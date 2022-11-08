@@ -7,6 +7,7 @@ import React, {
   useEffect,
   SyntheticEvent,
 } from "react";
+// import PropTypes from 'prop-types'
 import { useMutation, useLazyQuery } from "react-apollo";
 import { defineMessages, useIntl } from "react-intl";
 import { ProductContext } from "vtex.product-context";
@@ -14,6 +15,7 @@ import { ToastContext, Button } from "vtex.styleguide";
 import OutlinedButton from "./components/OutlinedButton";
 import { useRuntime, NoSSR } from "vtex.render-runtime";
 import { useCssHandles } from "vtex.css-handles";
+import { Helmet } from 'vtex.render-runtime'
 import { usePixel } from "vtex.pixel-manager";
 
 import { getSession } from "./modules/session";
@@ -60,6 +62,10 @@ const messages: {
   productAddedToList: {
     defaultMessage: "",
     id: "store/wishlist-product-added-to-list",
+  },
+  productRemovedFromList: {
+    defaultMessage: "",
+    id: "store/wishlist-product-removed-from-list",
   },
   addProductFail: {
     defaultMessage: "",
@@ -153,6 +159,8 @@ const AddBtn: FC<AddBtnProps> = ({
           ...state,
           isWishlistPage: false,
         });
+
+        toastMessage("productRemovedFromList", toastURL);
       },
     }
   );
@@ -182,7 +190,8 @@ const AddBtn: FC<AddBtnProps> = ({
           }),
       };
     }
-    if (messsageKey === "productAddedToList") {
+
+    if (messsageKey === "productAddedToList" || "productRemovedFromList") {
       action = {
         label: intl.formatMessage(messages.seeLists),
         onClick: () =>
@@ -195,7 +204,7 @@ const AddBtn: FC<AddBtnProps> = ({
 
     showToast({
       message: intl.formatMessage(messages[messsageKey]),
-      action,
+      action
     });
   };
 
@@ -260,6 +269,7 @@ const AddBtn: FC<AddBtnProps> = ({
           listItem: {
             productId,
             title: product.productName,
+            sku: selectedItem.itemId,
           },
           shopperId,
           name: defaultValues.LIST_NAME,
@@ -282,10 +292,9 @@ const AddBtn: FC<AddBtnProps> = ({
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       "false"
       ? false
-      : wishListed.find(
-          (item: any) => item.productId === productId && item.sku === sku
-        ) !== undefined;
-  };
+      : wishListed.find((item: any) => item.productId === productId) !==
+          undefined
+  }
 
   const handleAddProductClick = (e: SyntheticEvent) => {
     e.preventDefault();
@@ -356,8 +365,29 @@ const AddBtn: FC<AddBtnProps> = ({
     }
   }
 
+  const successfulCartIcon = `
+    .vtex-toast {
+      background-repeat: no-repeat;
+      background-position: 9px center;
+      background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M15 2.66666C8.19563 2.66666 2.67143 8.18397 2.67143 15C2.67143 21.816 8.19563 27.3333 15 27.3333C21.8043 27.3333 27.3285 21.816 27.3285 15C27.3285 8.18397 21.8043 2.66666 15 2.66666ZM0.661865 15C0.661865 7.08841 7.07674 0.666656 15 0.666656C22.9232 0.666656 29.3381 7.08841 29.3381 15C29.3381 22.9116 22.9232 29.3333 15 29.3333C7.07674 29.3333 0.661865 22.9116 0.661865 15ZM22.3754 8.95786C22.7688 9.34746 22.7703 9.98062 22.3788 10.3721L13.0455 19.7054C12.8569 19.894 12.6006 20 12.3333 20C12.066 20 11.8097 19.894 11.6211 19.7054L7.62113 15.7054C7.22968 15.314 7.2312 14.6808 7.62452 14.2912C8.01785 13.9016 8.65404 13.9031 9.0455 14.2946L12.3333 17.5824L20.9545 8.96124C21.3459 8.56978 21.9821 8.56827 22.3754 8.95786Z' fill='%23FCFCFC'/%3E%3C/svg%3E%0A");
+    }
+    .lh-copy {
+      margin-left: 18px;
+      width: 15em;
+    }
+    .vtex-alert__close-icon {
+      display: none
+    }
+    .vtex-toast, .vtex-button__label {
+      padding-right: 16px
+    }
+    `
+
   return (
     <NoSSR>
+      <Helmet key={`helmet-wishlist-icon`}>
+        <style id="helmetWishlistIcon">{successfulCartIcon}</style>
+      </Helmet>
       {buttonType === "ICON" ? (
         // STANDARD VTEX HEART ICON BUTTON
         <div className={handles.wishlistIconContainer}>
@@ -381,7 +411,7 @@ const AddBtn: FC<AddBtnProps> = ({
             onClick={handleAddProductClick}
             loading={loading || addLoading || removeLoading}
           >
-            {checkFill() ? "REMOVE FROM WISHLIST" : "ADD TO WISHLIST"}
+            {checkFill() ? "Removed from wishlist" : "Added To wishlist"}
           </OutlinedButton>
         </div>
       )}
