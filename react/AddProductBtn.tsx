@@ -381,7 +381,7 @@ const AddBtn: FC<AddBtnProps> = ({
     .vtex-toast, .vtex-button__label {
       padding-right: 16px
     }
-    `
+    ` 
 
   return (
     <NoSSR>
