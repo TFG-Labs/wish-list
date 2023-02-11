@@ -50,7 +50,7 @@ namespace WishList.Services
             }
             else
             {
-                _context.Vtex.Logger.Debug("GetList", null, $"Retrying... '{shopperId}' '{listName}'");
+
                 wishListWrapper = await _wishListRepository.GetWishList(shopperId);
                 if (wishListWrapper != null && wishListWrapper.ListItemsWrapper != null)
                 {
@@ -81,7 +81,6 @@ namespace WishList.Services
             ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
-                _context.Vtex.Logger.Debug("SaveList", null, $"Saving '{shopperId}' '{listName}' {listItems.Count} new items {listItemsWrapper.ListItems.Count} existing items.");
                 listItemsToSave = listItemsWrapper.ListItems;
                 foreach (ListItem listItem in listItems)
                 {
@@ -90,7 +89,6 @@ namespace WishList.Services
             }
             else
             {
-                _context.Vtex.Logger.Debug("SaveList", null, $"Saving '{shopperId}' '{listName}' {listItems.Count} new items.");
                 listItemsToSave = listItems;
             }
 
@@ -105,9 +103,8 @@ namespace WishList.Services
             ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
             if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
             {
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
                 listItemsToSave = listItemsWrapper.ListItems;
-                if(listItem.Id == null)
+                if (listItem.Id == null)
                 {
                     int maxId = 0;
                     if (listItemsToSave.Count > 0)
@@ -116,7 +113,7 @@ namespace WishList.Services
                     }
 
                     listItem.Id = ++maxId;
-                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Setting Id: {listItem.Id}");
+
                 }
                 else
                 {
@@ -124,7 +121,7 @@ namespace WishList.Services
                     ListItem itemToRemove = listItemsToSave.Where(r => r.Id == listItem.Id).FirstOrDefault();
                     if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
                     {
-                        _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Removing {listItem.Id}");
+
                         listItemsToSave.Remove(itemToRemove);
                     }
                 }
@@ -135,14 +132,11 @@ namespace WishList.Services
             {
                 listItem.Id = listItem.Id ?? 0;
                 listItemsToSave = new List<ListItem> { listItem };
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' First Item: {listItem.Id}");
+
             }
 
-            if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
-            {
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Saved: {listItem.Id}");
-            }
-            else
+            if (!await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
+
             {
                 _context.Vtex.Logger.Warn("SaveItem", null, $"Saving '{shopperId}' '{listName}' Failed to save: {listItem.Id}");
             }

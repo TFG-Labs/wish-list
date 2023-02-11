@@ -88,7 +88,7 @@
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            _context.Vtex.Logger.Debug("SaveWishList", null, $"'{shopperId}' '{listName}' '{documentId}' [{response.StatusCode}]\n{responseContent}");
+
 
             return response.IsSuccessStatusCode;
         }
@@ -111,21 +111,21 @@
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
                 request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
-            
+
             request.Headers.Add("Cache-Control", "no-cache");
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            _context.Vtex.Logger.Debug("GetWishList", null, $"'{shopperId}' [{response.StatusCode}]\n{responseContent}");
+
             ResponseListWrapper responseListWrapper = new ResponseListWrapper();
             try
             {
                 JArray searchResult = JArray.Parse(responseContent);
-                for(int l = 0; l < searchResult.Count; l++)
+                for (int l = 0; l < searchResult.Count; l++)
                 {
                     JToken listWrapper = searchResult[l];
-                    if(l == 0)
+                    if (l == 0)
                     {
                         responseListWrapper = JsonConvert.DeserializeObject<ResponseListWrapper>(listWrapper.ToString());
                     }
@@ -136,7 +136,7 @@
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 responseListWrapper.message = $"Error:{ex.Message}: Rsp = {responseContent} ";
                 _context.Vtex.Logger.Error("GetWishList", null, $"Error getting list for {shopperId}", ex);
@@ -196,16 +196,11 @@
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
             //Console.WriteLine($"Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
-            _context.Vtex.Logger.Debug("VerifySchema", null, $"Verifying Schema [{response.StatusCode}] {responseContent.Equals(WishListConstants.SCHEMA_JSON)}");
             if (response.IsSuccessStatusCode)
             {
-                if (responseContent.Equals(WishListConstants.SCHEMA_JSON))
+                if (!responseContent.Equals(WishListConstants.SCHEMA_JSON))
                 {
-                    _context.Vtex.Logger.Debug("VerifySchema", null, "Schema Verified.");
-                }
-                else
-                {
-                    _context.Vtex.Logger.Debug("VerifySchema", null, $"Schema does not match.\n{responseContent}");
+                    _context.Vtex.Logger.Warn("VerifySchema", null, $"Schema does not match.\n{responseContent}");
                     request = new HttpRequestMessage
                     {
                         Method = HttpMethod.Put,
@@ -216,15 +211,14 @@
                     authToken = _context.Vtex.AdminUserAuthToken;
                     //if (authToken != null)
                     //{
-                        request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
-                        request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
-                        request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
+                    request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+                    request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
+                    request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
                     //}
 
                     response = await client.SendAsync(request);
                     responseContent = await response.Content.ReadAsStringAsync();
                     //Console.WriteLine($"Applying Schema [{response.StatusCode}] {responseContent}");
-                    _context.Vtex.Logger.Debug("VerifySchema", null, $"Applying Schema [{response.StatusCode}] {responseContent}");
                 }
             }
         }
@@ -244,13 +238,13 @@
                 request.Headers.Add(WishListConstants.VtexIdCookie, authToken);
                 request.Headers.Add(WishListConstants.PROXY_AUTHORIZATION_HEADER_NAME, authToken);
             }
-            
+
             request.Headers.Add("Cache-Control", "no-cache");
 
             var client = _clientFactory.CreateClient();
             var response = await client.SendAsync(request);
             string responseContent = await response.Content.ReadAsStringAsync();
-            _context.Vtex.Logger.Debug("GetAllLists", null, $"[{response.StatusCode}]");
+
             WishListsWrapper wishListsWrapper = new WishListsWrapper();
             wishListsWrapper.WishLists = new List<WishListWrapper>();
             WishListWrapper responseListWrapper = new WishListWrapper();
