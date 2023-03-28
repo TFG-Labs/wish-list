@@ -22,6 +22,7 @@ import checkItem from "./queries/checkItem.gql";
 import addToList from "./queries/addToList.gql";
 import removeFromList from "./queries/removeFromList.gql";
 import styles from "./styles.css";
+import { showLoginToast, showRemoveToast, showSuccessToast } from "./components/ToastMessage/Toast";
 
 const localStore: any = storageFactory(() => sessionStorage);
 const CSS_HANDLES = ["wishlistIconContainer", "wishlistIcon"];
@@ -209,7 +210,7 @@ const AddBtn: FC<AddBtnProps> = ({
           sku,
         };
         addWishlisted(productId, sku);
-        toastMessage("productAddedToList", toastURL);
+        showSuccessToast('Added to wishlist');
       },
     }
   );
@@ -290,6 +291,7 @@ const AddBtn: FC<AddBtnProps> = ({
   const handleAddProductClick = (e: SyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
     if (isAuthenticated) {
       const pixelEvent: any = {
         list: route?.canonicalPath?.replace("/", ""),
@@ -308,6 +310,11 @@ const AddBtn: FC<AddBtnProps> = ({
             name: defaultValues.LIST_NAME,
           },
         });
+
+        const wishlistedItems =  JSON.parse(sessionStorage.getItem('wishlist_wishlisted') ?? '[]')
+        const removedItems = wishlistedItems.filter((x: { productId: string; })=>x.productId !== productId)
+        sessionStorage.setItem('wishlist_wishlisted',JSON.stringify(removedItems) ) 
+        showRemoveToast('Removed from wishlist')
         pixelEvent.event = "removeToWishlist";
       } else {
         addProduct({
@@ -327,7 +334,7 @@ const AddBtn: FC<AddBtnProps> = ({
       push(pixelEvent);
     } else {
       localStore.setItem("wishlist_addAfterLogin", String(productId));
-      toastMessage("notLogged", toastURL);
+      showLoginToast('Log in to save items to wishlist.')
     }
   };
 

@@ -1,0 +1,41 @@
+.toastContainer {
+    width: 100%;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    top: 70px;
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 999;
+}
+
+.InnerItems {
+    background: #D1D1F9;
+    display: flex;
+    justify-content: space-between;
+    z-index: 999;
+    width: 400px;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.wishListLink {
+    text-decoration: none;
+    color: black;
+}
+
+
+@media screen and (max-width: 800px) {
+    .toastContainer {
+        bottom: 10px;
+    }
+
+    .InnerItems {
+        position: absolute;
+        width: 358px;
+        bottom: 10px;
+    }
+}
