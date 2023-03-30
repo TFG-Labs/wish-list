@@ -337,6 +337,7 @@ const AddBtn: FC<AddBtnProps> = ({
       showLoginToast('Log in to save items to wishlist.')
     }
   };
+
   if (
     data?.checkList?.inList &&
     (!productCheck[productId] || productCheck[productId].wishListId === null)
