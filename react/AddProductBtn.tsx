@@ -24,7 +24,6 @@ import styles from "./styles.css";
 import { showLoginToast, showRemoveToast, showSuccessToast } from "./components/ToastMessage/Toast";
 import { useProduct } from "vtex.product-context";
 
-
 const localStore: any = storageFactory(() => sessionStorage);
 
 const CSS_HANDLES = ["wishlistIconContainer", "wishlistIcon", "skuErrorMessage"];
@@ -286,8 +285,6 @@ const AddBtn: FC<AddBtnProps> = ({
     }
   }
 
-
-  
   const checkFill = () => {
     return sessionResponse?.namespaces?.profile?.isAuthenticated?.value ===
       "false"
@@ -298,9 +295,6 @@ const AddBtn: FC<AddBtnProps> = ({
   };
 
   const handleAddProductClick =  async (e: SyntheticEvent) => {
-
-
-
     e.preventDefault();
     e.stopPropagation();
 
