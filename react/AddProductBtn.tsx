@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-use-before-define */
+
 import React, {
   FC,
   useState,
@@ -92,15 +91,15 @@ const useSessionResponse = () => {
 
     sessionPromise.then((sessionResponse) => {
       const { response } = sessionResponse;
-
       setSession(response);
     });
+
   }, [sessionPromise]);
 
   return session;
 };
 
-const addWishlisted = (productId: any, sku: any) => {
+const addWishlisted = (productId: any, sku: any, id:any) => {
   if (
     wishListed.find(
       (item: any) =>
@@ -113,8 +112,10 @@ const addWishlisted = (productId: any, sku: any) => {
     wishListed.push({
       productId,
       sku,
+      id
     });
   }
+
   saveToLocalStorageItem(wishListed);
 };
 
@@ -145,7 +146,6 @@ const AddBtn: FC<AddBtnProps> = ({
             sku: "",
           };
         }
-
         wishListed = wishListed.filter(
           (item: any) => !(item.productId === productId && item.sku === sku)
         );
@@ -214,7 +214,7 @@ const AddBtn: FC<AddBtnProps> = ({
           isWishlisted: true,
           sku,
         };
-        addWishlisted(productId, sku);
+        addWishlisted(productId, selectedItem.itemId, res.id);
         showSuccessToast('Added to wishlist');
       },
     }
@@ -290,7 +290,7 @@ const AddBtn: FC<AddBtnProps> = ({
       "false"
       ? false
       : wishListed.find(
-          (item: any) => item.productId === productId && item.sku === sku
+          (item: any) => item.productId === productId && item.sku === selectedItem.itemId
         ) !== undefined;
   };
 
@@ -370,7 +370,9 @@ const AddBtn: FC<AddBtnProps> = ({
         (item: any) => item.productId === productId && item.sku === sku
       ) === undefined
     ) {
-      addWishlisted(productId, sku);
+
+      const wishlistId = data?.checkList?.listIds[0]
+      addWishlisted(productId, selectedItem.itemId,wishlistId);
     }
   }
 
