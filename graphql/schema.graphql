@@ -28,7 +28,7 @@ type CheckListType {
 input ListItemInputType {
   id: ID
   productId: String!
-  sku: String
+  sku: String!
   title: String
 }
 

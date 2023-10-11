@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-use-before-define */
+
 import React, {
   FC,
   useState,
@@ -15,7 +14,6 @@ import OutlinedButton from "./components/OutlinedButton";
 import { useRuntime, NoSSR } from "vtex.render-runtime";
 import { useCssHandles } from "vtex.css-handles";
 import { usePixel } from "vtex.pixel-manager";
-
 import { getSession } from "./modules/session";
 import storageFactory from "./utils/storage";
 import checkItem from "./queries/checkItem.gql";
@@ -23,9 +21,11 @@ import addToList from "./queries/addToList.gql";
 import removeFromList from "./queries/removeFromList.gql";
 import styles from "./styles.css";
 import { showLoginToast, showRemoveToast, showSuccessToast } from "./components/ToastMessage/Toast";
+import { useProduct } from "vtex.product-context";
 
 const localStore: any = storageFactory(() => sessionStorage);
-const CSS_HANDLES = ["wishlistIconContainer", "wishlistIcon"];
+
+const CSS_HANDLES = ["wishlistIconContainer", "wishlistIcon", "skuErrorMessage"];
 type ButtonType = "ICON" | "ICON_WITH_TEXT";
 
 type AddBtnProps = {
@@ -91,15 +91,15 @@ const useSessionResponse = () => {
 
     sessionPromise.then((sessionResponse) => {
       const { response } = sessionResponse;
-
       setSession(response);
     });
+
   }, [sessionPromise]);
 
   return session;
 };
 
-const addWishlisted = (productId: any, sku: any) => {
+const addWishlisted = (productId: any, sku: any, id:any) => {
   if (
     wishListed.find(
       (item: any) =>
@@ -112,8 +112,10 @@ const addWishlisted = (productId: any, sku: any) => {
     wishListed.push({
       productId,
       sku,
+      id
     });
   }
+
   saveToLocalStorageItem(wishListed);
 };
 
@@ -144,7 +146,6 @@ const AddBtn: FC<AddBtnProps> = ({
             sku: "",
           };
         }
-
         wishListed = wishListed.filter(
           (item: any) => !(item.productId === productId && item.sku === sku)
         );
@@ -159,14 +160,18 @@ const AddBtn: FC<AddBtnProps> = ({
   );
   const { navigate, history, route, account } = useRuntime();
   const { push } = usePixel();
-  const handles = useCssHandles(CSS_HANDLES);
+  const {handles} = useCssHandles(CSS_HANDLES);
   const { showToast } = useContext(ToastContext);
   const { selectedItem, product } = useContext(ProductContext) as any;
   const sessionResponse: any = useSessionResponse();
   const [handleCheck, { data, loading, called }] = useLazyQuery(checkItem);
+  const {skuSelector} = useProduct()
 
+ const { areAllVariationsSelected } = skuSelector
+  
   const [productId] = String(product?.productId).split("-");
   const sku = product?.sku?.itemId;
+
   wishListed = JSON.parse(localStore.getItem("wishlist_wishlisted")) ?? [];
 
   const toastMessage = (messsageKey: string, linkWishlist: string) => {
@@ -209,7 +214,7 @@ const AddBtn: FC<AddBtnProps> = ({
           isWishlisted: true,
           sku,
         };
-        addWishlisted(productId, sku);
+        addWishlisted(productId, selectedItem.itemId, res.id);
         showSuccessToast('Added to wishlist');
       },
     }
@@ -260,6 +265,7 @@ const AddBtn: FC<AddBtnProps> = ({
         variables: {
           listItem: {
             productId,
+            sku:selectedItem.itemId,
             title: product.productName,
           },
           shopperId,
@@ -284,11 +290,11 @@ const AddBtn: FC<AddBtnProps> = ({
       "false"
       ? false
       : wishListed.find(
-          (item: any) => item.productId === productId && item.sku === sku
+          (item: any) => item.productId === productId && item.sku === selectedItem.itemId
         ) !== undefined;
   };
 
-  const handleAddProductClick = (e: SyntheticEvent) => {
+  const handleAddProductClick =  async (e: SyntheticEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -317,18 +323,23 @@ const AddBtn: FC<AddBtnProps> = ({
         showRemoveToast('Removed from wishlist')
         pixelEvent.event = "removeToWishlist";
       } else {
-        addProduct({
-          variables: {
-            listItem: {
-              productId,
-              title: product.productName,
-              sku: selectedItem.itemId,
+        if(areAllVariationsSelected){
+          addProduct({
+            variables: {
+              listItem: {
+                productId,
+                title: product.productName,
+                sku: selectedItem.itemId,
+              },
+              shopperId,
+              name: defaultValues.LIST_NAME,
             },
-            shopperId,
-            name: defaultValues.LIST_NAME,
-          },
-        });
-        pixelEvent.event = "addToWishlist";
+          });
+          pixelEvent.event = "addToWishlist";
+        }else{
+          const showErrorMessage = document.querySelector('.thefoschini-tfg-sku-selector-0-x-skuErrorMessage--tfg-sku-selector--unselected') as HTMLInputElement
+          showErrorMessage.style.display = 'inline-block'
+        }
       }
 
       push(pixelEvent);
@@ -359,7 +370,9 @@ const AddBtn: FC<AddBtnProps> = ({
         (item: any) => item.productId === productId && item.sku === sku
       ) === undefined
     ) {
-      addWishlisted(productId, sku);
+
+      const wishlistId = data?.checkList?.listIds[0]
+      addWishlisted(productId, selectedItem.itemId,wishlistId);
     }
   }
 
