@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "vtex.add-to-cart-button": "0.x",
-    "vtex.css-handles": "0.x",
+    "vtex.css-handles": "1.x",
     "vtex.flex-layout": "0.x",
     "vtex.list-context": "0.x",
     "vtex.product-context": "0.x",
