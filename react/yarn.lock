@@ -4664,9 +4664,9 @@ test-exclude@^5.2.3:
     read-pkg-up "^4.0.0"
     require-main-filename "^2.0.0"
 
-"thefoschini.wish-list@http://thefoschini.vtexassets.com/_v/public/typings/v1/thefoschini.wish-list@0.0.5/public/@types/thefoschini.wish-list":
-  version "0.0.5"
-  resolved "http://thefoschini.vtexassets.com/_v/public/typings/v1/thefoschini.wish-list@0.0.5/public/@types/thefoschini.wish-list#1dc03b86d7b627d5143490984e2457ff26af0ffd"
+"thefoschini.wish-list@http://thefoschini.vtexassets.com/_v/public/typings/v1/thefoschini.wish-list@0.0.6/public/@types/thefoschini.wish-list":
+  version "0.0.6"
+  resolved "http://thefoschini.vtexassets.com/_v/public/typings/v1/thefoschini.wish-list@0.0.6/public/@types/thefoschini.wish-list#91f80bff3694980b09c940f8c5f30e4a914b2646"
 
 throat@^4.0.0:
   version "4.1.0"
