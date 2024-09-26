@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +10,7 @@ using System.Threading.Tasks;
 using Vtex.Api.Context;
 using WishList.Data;
 using WishList.Models;
+using System.Net;
 
 namespace WishList.Services
 {
@@ -99,74 +102,210 @@ namespace WishList.Services
 
         public async Task<int?> SaveItem(ListItem listItem, string shopperId, string listName, bool? isPublic)
         {
-            IList<ListItem> listItemsToSave = null;
 
-            WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
-            ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
-            if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
+            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];            
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken) && string.IsNullOrEmpty(VtexIdclientAutCookieKey))
             {
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
-                listItemsToSave = listItemsWrapper.ListItems;
-                if(listItem.Id == null)
-                {
-                    int maxId = 0;
-                    if (listItemsToSave.Count > 0)
+                return null;
+            }
+
+            ValidatedUser validatedUser = null;
+            ValidatedUser validatedAdminUser = null;
+            ValidatedUser validatedKeyApp = null;
+
+            try {
+                validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+                validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
+                validatedKeyApp = await ValidateUserToken(VtexIdclientAutCookieKey);
+
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                return null;
+            }
+
+            // Validation for PII
+            if (shopperId.ToLower().Contains('@')) {
+                
+                if(_context.Vtex.StoreUserAuthToken != null) {
+                    ValidatedEmailToken responseValidateEmailAuthToken = null;
+
+                    try {
+                        responseValidateEmailAuthToken = await ValidateEmailAuthToken(_context.Vtex.StoreUserAuthToken);
+                    } catch (Exception ex)
                     {
-                        maxId = listItemsToSave.Max(t => t.Id ?? 0);
+                        _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                        return null;
+                    }   
+
+                    bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
+
+                    if (!hasValidateEmail)
+                    {
+                        _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
+                        return null;
+                    }
+                }
+                
+                if(VtexIdclientAutCookieKey != null) {
+                    ValidatedEmailToken responseValidateEmailAuthToken = null;
+
+                    try {
+                        responseValidateEmailAuthToken = await ValidateEmailAuthToken(VtexIdclientAutCookieKey);
+                    } catch (Exception ex)
+                    {
+                        _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                        return null;
+                    }   
+
+                    bool hasValidateEmail = responseValidateEmailAuthToken.User != null && responseValidateEmailAuthToken.User == shopperId && responseValidateEmailAuthToken.TokenType != "appkey";
+
+                    if (!hasValidateEmail)
+                    {
+                        _context.Vtex.Logger.Warn("hasValidateEmail", null, "AuthToken is not valid for this ShopperId");
+                        return null;
+                    }
+                }
+            }
+
+
+            bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+            bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
+            bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
+
+            if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
+            {
+                _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
+                return null;
+            }
+
+            if (hasPermission || hasAdminPermission || hasPermissionToken) {
+
+                IList<ListItem> listItemsToSave = null;
+
+                WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+                ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
+                if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
+                {
+                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' {listItemsWrapper.ListItems.Count} existing items.");
+                    listItemsToSave = listItemsWrapper.ListItems;
+                    foreach (ListItem item in listItemsToSave)
+                    {
+                        if (listItem.ProductId ==  item.ProductId)
+                        {
+                            listItem.Id = item.Id;
+                        }
+                    }
+                    if(listItem.Id == null)
+                    {
+                        int maxId = 0;
+                        if (listItemsToSave.Count > 0)
+                        {
+                            maxId = listItemsToSave.Max(t => t.Id ?? 0);
+                        }
+
+                        listItem.Id = ++maxId;
+                        _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Setting Id: {listItem.Id}");
+                    }
+                    else
+                    {
+                        // If an Id has been specified, remove existing item
+                        ListItem itemToRemove = listItemsToSave.Where(r => r.Id == listItem.Id).FirstOrDefault();
+                        if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
+                        {
+                            _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Removing {listItem.Id}");
+                            listItemsToSave.Remove(itemToRemove);
+                        }
                     }
 
-                    listItem.Id = ++maxId;
-                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Setting Id: {listItem.Id}");
+                    listItemsToSave.Add(listItem);
                 }
                 else
                 {
-                    // If an Id has been specified, remove existing item
-                    ListItem itemToRemove = listItemsToSave.Where(r => r.Id == listItem.Id).FirstOrDefault();
-                    if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
-                    {
-                        _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Removing {listItem.Id}");
-                        listItemsToSave.Remove(itemToRemove);
-                    }
+                    listItem.Id = listItem.Id ?? 0;
+                    listItemsToSave = new List<ListItem> { listItem };
+                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' First Item: {listItem.Id}");
                 }
 
-                listItemsToSave.Add(listItem);
-            }
-            else
-            {
-                listItem.Id = listItem.Id ?? 0;
-                listItemsToSave = new List<ListItem> { listItem };
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' First Item: {listItem.Id}");
+                if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
+                {
+                    _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Saved: {listItem.Id}");
+                }
+                else
+                {
+                    _context.Vtex.Logger.Warn("SaveItem", null, $"Saving '{shopperId}' '{listName}' Failed to save: {listItem.Id}");
+                }
+
+                return listItem.Id;
+                
+            } else {
+
+                return null;
             }
 
-            if(await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, isPublic, wishListWrapper.Id))
-            {
-                _context.Vtex.Logger.Debug("SaveItem", null, $"Saving '{shopperId}' '{listName}' Saved: {listItem.Id}");
-            }
-            else
-            {
-                _context.Vtex.Logger.Warn("SaveItem", null, $"Saving '{shopperId}' '{listName}' Failed to save: {listItem.Id}");
-            }
 
-            return listItem.Id;
         }
 
         public async Task<bool> RemoveItem(int itemId, string shopperId, string listName)
         {
-            bool wasRemoved = false;
-            IList<ListItem> listItemsToSave = null;
-            WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
-            ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
-            if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
+
+            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken) && string.IsNullOrEmpty(VtexIdclientAutCookieKey))
             {
-                listItemsToSave = listItemsWrapper.ListItems;
-                ListItem itemToRemove = listItemsToSave.FirstOrDefault(r => r.Id == itemId);
-                if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
-                {
-                    wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
-                }
+                return false;
             }
 
-            return wasRemoved;
+            ValidatedUser validatedUser = null;
+            ValidatedUser validatedAdminUser = null;
+            ValidatedUser validatedKeyApp = null;
+
+            try {
+                validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+                validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
+                validatedKeyApp = await ValidateUserToken(VtexIdclientAutCookieKey);
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+                return false;
+            }
+
+            bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+            bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
+            bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
+
+
+            if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
+            {
+                _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
+                return false;
+            }
+
+            if (hasPermission || hasAdminPermission || hasPermissionToken) {
+
+                bool wasRemoved = false;
+                IList<ListItem> listItemsToSave = null;
+                WishListWrapper wishListWrapper = await this.GetList(shopperId, listName);
+                ListItemsWrapper listItemsWrapper = wishListWrapper.ListItemsWrapper.FirstOrDefault();
+                if (listItemsWrapper != null && listItemsWrapper.ListItems != null)
+                {
+                    listItemsToSave = listItemsWrapper.ListItems;
+                    ListItem itemToRemove = listItemsToSave.FirstOrDefault(r => r.Id == itemId);
+                    if (itemToRemove != null && listItemsToSave.Remove(itemToRemove))
+                    {
+                        wasRemoved = await _wishListRepository.SaveWishList(listItemsToSave, shopperId, listName, listItemsWrapper.IsPublic, wishListWrapper.Id);
+                    }
+                }
+
+                return wasRemoved;
+
+            } else {
+                return false;
+            }
+
         }
 
         public async Task<IList<ListItem>> LimitList(IList<ListItem> listItems, int from, int to)
@@ -180,6 +319,139 @@ namespace WishList.Services
             listItems = listItems.Skip(from - 1).Take(take).ToList();
 
             return listItems;
+        }
+
+        public async Task<ValidatedUser> ValidateUserToken(string token)
+        {
+            ValidatedUser validatedUser = null;
+            ValidateToken validateToken = new ValidateToken
+            {
+                Token = token
+            };
+
+            var jsonSerializedToken = JsonConvert.SerializeObject(validateToken);
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.vtexcommercestable.com.br/api/vtexid/credential/validate"),
+                Content = new StringContent(jsonSerializedToken, Encoding.UTF8, WishListConstants.APPLICATION_JSON)
+            };
+
+            string authToken = this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.HEADER_VTEX_CREDENTIAL];
+
+            if (authToken != null)
+            {
+                request.Headers.Add(WishListConstants.AUTHORIZATION_HEADER_NAME, authToken);
+            }
+
+            var client = _clientFactory.CreateClient();
+
+            try
+            {
+                var response = await client.SendAsync(request);
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    validatedUser = JsonConvert.DeserializeObject<ValidatedUser>(responseContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("ValidateUserToken", null, $"Error validating user token", ex);
+            }
+
+            return validatedUser;
+        }
+        public async Task<ValidatedEmailToken> ValidateEmailAuthToken(string token)
+        {
+            ValidatedEmailToken validatedUser = null;
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://{this._httpContextAccessor.HttpContext.Request.Headers[WishListConstants.VTEX_ACCOUNT_HEADER_NAME]}.myvtex.com/api/vtexid/pub/authenticated/user?authToken={token}")
+            };
+
+            var client = _clientFactory.CreateClient();
+
+            try
+            {
+                var response = await client.SendAsync(request);
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    validatedUser = JsonConvert.DeserializeObject<ValidatedEmailToken>(responseContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("ValidateUserToken", null, $"Error validating user token", ex);
+            }
+
+            return validatedUser;
+        }
+
+        public async Task<HttpStatusCode> IsValidAuthUser()
+        {
+
+            string VtexIdclientAutCookieKey = this._httpContextAccessor.HttpContext.Request.Headers["VtexIdclientAutCookie"];
+
+            if (string.IsNullOrEmpty(_context.Vtex.StoreUserAuthToken) && string.IsNullOrEmpty(_context.Vtex.AdminUserAuthToken) && string.IsNullOrEmpty(VtexIdclientAutCookieKey))
+            {
+                return HttpStatusCode.Unauthorized;
+            }
+            
+            ValidatedUser validatedUser = null;
+            ValidatedUser validatedAdminUser = null;
+            ValidatedUser validatedKeyApp = null;
+
+            try {
+                validatedUser = await ValidateUserToken(_context.Vtex.StoreUserAuthToken);
+                validatedAdminUser = await ValidateUserToken(_context.Vtex.AdminUserAuthToken);
+                validatedKeyApp = await ValidateUserToken(VtexIdclientAutCookieKey);
+            }
+            catch (Exception ex)
+            {
+                _context.Vtex.Logger.Error("IsValidAuthUser", null, "Error fetching user", ex);
+
+                return HttpStatusCode.BadRequest;
+            }
+
+
+            bool hasPermission = validatedUser != null && validatedUser.AuthStatus.Equals("Success");
+            bool hasAdminPermission = validatedAdminUser != null && validatedAdminUser.AuthStatus.Equals("Success");
+            bool hasPermissionToken = validatedKeyApp != null && validatedKeyApp.AuthStatus.Equals("Success");
+
+            if (!hasPermission && !hasAdminPermission && !hasPermissionToken)
+            {
+                _context.Vtex.Logger.Warn("IsValidAuthUser", null, "User Does Not Have Permission");
+
+                return HttpStatusCode.Forbidden;
+            }
+
+            return HttpStatusCode.OK;
+        }
+
+        public async Task<int> GetListSizeBase()
+        {
+
+            int wishListAllSize = await _wishListRepository.GetListsSize();
+            return wishListAllSize;
+        }
+
+        public async Task<WishListsWrapper> ExportAllWishLists()
+        {
+            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllLists();
+            return wishListsWrapper;
+        }
+
+        public async Task<WishListsWrapper> ExportAllWishListsPaged(int pageList)
+        {
+            WishListsWrapper wishListsWrapper = await _wishListRepository.GetAllListsPaged(pageList);
+            return wishListsWrapper;
         }
     }
 }

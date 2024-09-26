@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using WishList.GraphQL.Types;
 using WishList.Models;
 using WishList.Services;
@@ -20,13 +21,25 @@ namespace WishList.GraphQL
             FieldAsync<ListResponseType>(
                 "viewList",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id"},
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id"},
                     new QueryArgument<StringGraphType> { Name = "name", Description = "List Name" },
                     new QueryArgument<IntGraphType> { Name = "from", Description = "From" },
                     new QueryArgument<IntGraphType> { Name = "to", Description = "To" }
                 ),
                 resolve: async context =>
                 {
+
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
+
                     string shopperId = context.GetArgument<string>("shopperId");
                     string name = context.GetArgument<string>("name");
                     int from = context.GetArgument<int>("from");
@@ -77,12 +90,24 @@ namespace WishList.GraphQL
             FieldAsync<ListGraphType<ListResponseType>>(
                 "viewLists",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" },
                     new QueryArgument<IntGraphType> { Name = "from", Description = "From" },
                     new QueryArgument<IntGraphType> { Name = "to", Description = "To" }
                 ),
                 resolve: async context =>
                 {
+                    
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
+
                     string shopperId = context.GetArgument<string>("shopperId");
                     int from = context.GetArgument<int>("from");
                     int to = context.GetArgument<int>("to");
@@ -135,17 +160,30 @@ namespace WishList.GraphQL
 
                     return resultLists;
                 }
+                
             );
 
             FieldAsync<CheckListType>(
                 "checkList",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" },
                     new QueryArgument<StringGraphType> { Name = "productId", Description = "Product Id" },
                     new QueryArgument<StringGraphType> { Name = "sku", Description = "Product Sku" }
                 ),
                 resolve: async context =>
                 {
+
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
+
                     string shopperId = context.GetArgument<string>("shopperId");
                     string productId = context.GetArgument<string>("productId");
                     string sku = context.GetArgument<string>("sku");
@@ -200,10 +238,20 @@ namespace WishList.GraphQL
             FieldAsync<StringGraphType>(
                 "listNames",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "shopperId", Description = "Shopper Id" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "shopperId", Description = "Shopper Id" }
                 ),
                 resolve: async context =>
                 {
+                    HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                    if (isValidAuthUser != HttpStatusCode.OK)
+                    {
+                        context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                        {
+                            Code = isValidAuthUser.ToString()
+                        });
+
+                        return null;
+                    }
                     string shopperId = context.GetArgument<string>("shopperId");
                     ResponseListWrapper allLists = await wishListService.GetLists(shopperId);
                     IList<ListItemsWrapper> listItemsWrappers = allLists.ListItemsWrapper;
@@ -213,6 +261,72 @@ namespace WishList.GraphQL
                     return listName.ToArray();
                 }
             );
+
+            FieldAsync<IntGraphType>(
+                 "listSize",
+                 resolve: async context =>
+                 {
+                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     if (isValidAuthUser != HttpStatusCode.OK)
+                     {
+                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         {
+                             Code = isValidAuthUser.ToString()
+                         });
+
+                         return null;
+                     }
+
+                     int AllListSize = await wishListService.GetListSizeBase();
+                     
+                     return AllListSize;
+                 }
+             );
+
+            FieldAsync<ListGraphType<WishListWrapperType>>(
+                 "exportList",
+                 resolve: async context =>
+                 {
+                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     if (isValidAuthUser != HttpStatusCode.OK)
+                     {
+                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         {
+                             Code = isValidAuthUser.ToString()
+                         });
+
+                         return null;
+                     }
+
+                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishLists();
+                     return wishListsWrapper.WishLists;
+                 }
+             );
+
+            FieldAsync<ListGraphType<WishListWrapperType>>(
+                 "exportListPaged",
+                 arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "pageList", Description = "page list" }
+                 ),
+                 resolve: async context =>
+                 {
+                     HttpStatusCode isValidAuthUser = await wishListService.IsValidAuthUser();
+                     if (isValidAuthUser != HttpStatusCode.OK)
+                     {
+                         context.Errors.Add(new ExecutionError(isValidAuthUser.ToString())
+                         {
+                             Code = isValidAuthUser.ToString()
+                         });
+
+                         return null;
+                     }
+
+                     int pageList = context.GetArgument<int>("pageList");
+
+                     WishListsWrapper wishListsWrapper = await wishListService.ExportAllWishListsPaged(pageList);
+                     return wishListsWrapper.WishLists;
+                 }
+             );
         }
     }
 }
