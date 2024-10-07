@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 
 import React, {
   FC,
@@ -183,7 +184,8 @@ const AddBtn: FC<AddBtnProps> = ({
           navigate({
             page: "store.login",
             query: `returnUrl=${encodeURIComponent(
-              history?.location?.pathname
+              String(history?.location?.pathname) +
+                String(history?.location?.search)
             )}`,
           }),
       };
@@ -259,7 +261,7 @@ const AddBtn: FC<AddBtnProps> = ({
     return item.listIds[pos];
   };
 
-  if (isAuthenticated && product && !called) {
+  if (isAuthenticated && product && !called && !!shopperId && !!sessionResponse) { 
     if (isAuthenticated && addAfterLogin && addAfterLogin === productId) {
       addProduct({
         variables: {
@@ -308,7 +310,7 @@ const AddBtn: FC<AddBtnProps> = ({
         },
       };
 
-      if (checkFill()) {
+      if (checkFill() && !!shopperId) {
         removeProduct({
           variables: {
             id: productCheck[productId].wishListId,
@@ -337,7 +339,7 @@ const AddBtn: FC<AddBtnProps> = ({
           });
           pixelEvent.event = "addToWishlist";
         }else{
-          const showErrorMessage = document.querySelector('.thefoschini-tfg-sku-selector-0-x-skuErrorMessage--tfg-sku-selector--unselected') as HTMLInputElement
+          const showErrorMessage = document.querySelector('.thefoschiniqa-tfg-sku-selector-0-x-skuErrorMessage--tfg-sku-selector--unselected') as HTMLInputElement
           showErrorMessage.style.display = 'inline-block'
         }
       }

@@ -7,13 +7,238 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
-## [0.0.7] - 2023-10-12
+## [0.18.4] - 2024-10-07
 
-## [0.0.6] - 2023-10-11
+## [0.8.1] - 2024-10-07
 
-## [0.0.5] - 2023-03-30
+## [1.18.6] - 2024-10-07
 
-## [0.0.4] - 2023-03-30
+## [1.18.5] - 2024-10-07
+
+## [1.18.4] - 2024-10-03
+
+## [1.18.3] - 2024-09-17
+
+### Fix
+
+- shopperId was email even if account is PII
+
+## [1.18.2] - 2024-08-14
+
+### Fix
+
+- validate shopperID Email or UserID
+
+## [1.18.1] - 2024-08-05
+
+### Added
+
+- validate authToken with shoperId
+
+## [1.18.0] - 2024-05-15
+
+### Added
+
+- Hungarian translations
+
+## [1.17.2] - 2024-05-08
+
+## [1.17.1] - 2024-04-30
+
+## [1.17.0] - 2024-04-18
+
+## [1.16.10] - 2024-04-10
+
+## [1.16.9] - 2024-03-21
+
+## [1.16.9] - 2024-03-21
+
+## [1.16.8] - 2024-03-20
+
+## [1.16.7] - 2024-03-08
+
+## [1.16.6] - 2024-02-29
+
+### Added
+- Admin authentication added
+
+## [1.16.5] - 2024-02-21
+
+### Fixed
+- Authentication to queries and mutation fixed
+
+### Added
+- Authentication yo queries and mutation added
+
+## [1.16.3] - 2024-01-22
+
+## [1.16.2] - 2024-01-10
+
+### Fixed
+
+-Fix null pointer exception
+
+### Fixed
+
+- GA event error due to undefined selectedItem
+
+## [1.16.1] - 2023-04-25
+### Fixed
+- Updated readme.md according to task LOC-10496.
+
+## [1.16.0] - 2023-03-27
+
+### Added
+- German translation.
+
+## [1.15.8] - 2023-02-27
+
+### Fixed
+- `skuSpecifications` to empty array if **null**
+
+## [1.15.7] - 2023-02-24
+
+### Fixed
+
+- [ENGINEERS-1127] Standardization of file names for Cypress tests
+
+### Added
+
+- Added export graphql testcase and removed readwishlistdata api
+
+
+## [1.15.6] - 2023-01-26
+
+### Added
+
+- Added exportList graphql for the download feature
+
+## [1.15.5] - 2023-01-25
+
+### Fixed
+
+- Change export-list Api to private for preventing data leak
+
+### Changed
+
+- Cypress code improvements
+
+## [1.15.4] - 2022-11-23
+
+## [1.15.3] - 2022-11-14
+
+### Fixed
+
+- minimist package updated from 1.2.5 to 1.2.7 due a critical security vulnerability
+
+## [1.15.2] - 2022-10-19
+
+### Fixed
+
+- Fixed lazyload inlist data cause unfavorited item shows favorited without refresh
+
+### Fixed
+
+- Fixed the return url after login to include the search field
+
+### Changed
+
+- GitHub reusable workflow and cy-runner updated to version 2
+
+## [1.15.1] - 2022-09-27
+
+### Fixed
+
+- English, Spanish and Italian translations.
+
+## [1.15.0] - 2022-08-09
+
+### Added
+
+- GraphQL mutation security.
+- Logging optimization.
+
+## [1.14.0] - 2022-06-21
+
+### Added
+
+- Thai translation.
+
+## [1.13.2] - 2022-06-10
+
+### Fixed
+
+- Added specificationGroups values for the productsByIdentifier query
+
+## [1.13.1] - 2022-05-10
+
+### Fixed
+
+- Fix custom empty wishlist component display when viewed by users who have yet to interact with the wishlist
+
+## [1.13.0] - 2022-04-29
+
+### Fixed
+
+- Set the shopperId as the required field for GetWishList to prevent empty shopperId passed
+
+## [1.12.2] - 2022-03-31
+
+### Fixed
+
+- Fix updating removed wishlist item in localstorage
+
+## [1.12.1] - 2022-03-29
+
+### Fixed
+
+- Fix function of removing from storefront localstorage wishlist
+
+## [1.12.0] - 2022-03-17
+
+### Added
+
+- Arabic translation.
+
+## [1.11.5] - 2022-03-17
+
+### Fixed
+
+- Set timeout to 60s to avoid proxy time-out error when downloading a large amount of data
+
+### Fixed
+
+- Add immediate indexing to the schema to solve masterdata delay update
+
+## [1.11.4] - 2022-03-15
+
+### Fixed
+
+- Fix VerifySchema invalid header error when VerifySchema called without data entry, using app's authtoken instead of the user's authtoken.
+
+## [1.11.3] - 2022-03-14
+
+### Fixed
+
+- Fix favorited check and stop duplicate item added to same list
+
+## [1.11.2] - 2022-03-02
+
+### Fixed
+
+- Fix products added to wishlist before logging in are not displayed
+
+## [1.11.1] - 2022-03-01
+
+### Added
+
+- Added URL information in README file for the user
+
+## [1.11.0] - 2022-02-25
+
+### Fixed
+
+- Fix the api for downloading all the wishlist records
 
 ## [1.10.0] - 2022-01-28
 

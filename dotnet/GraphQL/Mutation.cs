@@ -5,6 +5,11 @@ using WishList.GraphQL.Types;
 using WishList.Models;
 using WishList.Services;
 
+// using Newtonsoft.Json;
+using System;
+using System.Linq;
+using System.Net;
+
 namespace WishList.GraphQL
 {
     [GraphQLMetadata("Mutation")]
@@ -24,6 +29,7 @@ namespace WishList.GraphQL
                 ),
                 resolve: context =>
                 {
+                    
                     var listItem = context.GetArgument<ListItem>("listItem");
                     string shopperId = context.GetArgument<string>("shopperId");
                     string listName = context.GetArgument<string>("name");
@@ -41,6 +47,7 @@ namespace WishList.GraphQL
                 ),
                 resolve: context =>
                 {
+
                     int id = context.GetArgument<int>("id");
                     string shopperId = context.GetArgument<string>("shopperId");
                     string listName = context.GetArgument<string>("name");

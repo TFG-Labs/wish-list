@@ -3,12 +3,20 @@
   "memory": 256,
   "minReplicas": 1,
   "maxReplicas": 5,
+  "timeout": 60,
+  "ttl": 60,
   "runtimeArgs": [
   ],
   "routes": {
     "ExportAllLists": {
       "path": "/_v/wishlist/export-lists",
-      "public": true
+      "public": false,
+      "policies": [
+        {
+          "effect": "allow",
+          "actions": ["get"]
+        }
+      ]
     }
   },
   "events": {

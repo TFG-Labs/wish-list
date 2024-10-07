@@ -1,0 +1,15 @@
+export default {
+  WishListContainer: 'div[class*=wishlistIconContainer]',
+  WishListIcon: 'div[class*=wishlistIconContainer] > button',
+  ToastButton: '.vtex-toast-container button',
+  LoginEmail: 'div[class*=inputContainerEmail] input[type=text]',
+  LoginPassword: 'div[class*=inputContainerPassword] input[type=password]',
+  LoginButton: 'div[class*=sendButton] > button',
+  ProductSummaryContainer: 'section[class*=vtex-product-summary]',
+  AccounPage: '.vtex-account__page',
+  WishListOutLine: 'span[class*=outline]',
+  WishListFill: 'span[class*=fill]',
+  ThumbnailSwiper: '[data-testid=thumbnail-swiper]',
+  WishListMenu: '#menu-wishlist',
+  WishListAccountPage: 'a[href="#/wishlist"]',
+}
