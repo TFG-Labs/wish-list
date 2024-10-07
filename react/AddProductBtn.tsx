@@ -339,7 +339,7 @@ const AddBtn: FC<AddBtnProps> = ({
           });
           pixelEvent.event = "addToWishlist";
         }else{
-          const showErrorMessage = document.querySelector('.thefoschini-tfg-sku-selector-0-x-skuErrorMessage--tfg-sku-selector--unselected') as HTMLInputElement
+          const showErrorMessage = document.querySelector('.thefoschiniqa-tfg-sku-selector-0-x-skuErrorMessage--tfg-sku-selector--unselected') as HTMLInputElement
           showErrorMessage.style.display = 'inline-block'
         }
       }
