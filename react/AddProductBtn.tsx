@@ -326,9 +326,11 @@ const AddBtn: FC<AddBtnProps> = ({
         showRemoveToast('Removed from wishlist')
         pixelEvent.event = "removeToWishlist";
         dataLayerEvent = {
-          event: 'remove_from_wishlist',
-          productId,
           title: product.productName,
+          eventLabel: "remove_from_wishlist",
+          eventAction: `productId: ${productId}}`,
+          eventDescription: "User removed productId from wishlist",
+          eventCategory: "Wishlist_Event",
         };
       } else {
         if(areAllVariationsSelected){
@@ -345,9 +347,11 @@ const AddBtn: FC<AddBtnProps> = ({
           });
           pixelEvent.event = "addToWishlist";
           dataLayerEvent = {
-            event: 'add_to_wishlist',
-            productId,
             title: product.productName,
+            eventLabel: "add_to_wishlist",
+            eventAction: `productId: ${productId}}`,
+            eventDescription: "User added productId to wishlist",
+            eventCategory: "Wishlist_Event",
           };
         }else{
           const showErrorMessage = document.querySelector('.thefoschini-tfg-sku-selector-0-x-skuErrorMessage--tfg-sku-selector--unselected') as HTMLInputElement
@@ -356,7 +360,11 @@ const AddBtn: FC<AddBtnProps> = ({
       }
 
       push(pixelEvent);
-      pushDatalayer(dataLayerEvent);
+      pushDatalayer({
+        event: 'gaEvent',
+        platform: 'WEB',
+        ...dataLayerEvent
+      });
     } else {
       localStore.setItem("wishlist_addAfterLogin", String(productId));
       showLoginToast('Log in to save items to wishlist.')
