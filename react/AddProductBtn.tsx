@@ -22,6 +22,7 @@ import removeFromList from "./queries/removeFromList.gql";
 import styles from "./styles.css";
 import { showLoginToast, showRemoveToast, showSuccessToast } from "./components/ToastMessage/Toast";
 import { useProduct } from "vtex.product-context";
+import { pushDatalayer } from "./utils/normalize";
 
 const localStore: any = storageFactory(() => sessionStorage);
 
@@ -298,6 +299,8 @@ const AddBtn: FC<AddBtnProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
+    let dataLayerEvent = {}
+
     if (isAuthenticated) {
       const pixelEvent: any = {
         list: route?.canonicalPath?.replace("/", ""),
@@ -322,6 +325,11 @@ const AddBtn: FC<AddBtnProps> = ({
         sessionStorage.setItem('wishlist_wishlisted',JSON.stringify(removedItems) ) 
         showRemoveToast('Removed from wishlist')
         pixelEvent.event = "removeToWishlist";
+        dataLayerEvent = {
+          event: 'remove_from_wishlist',
+          productId,
+          title: product.productName,
+        };
       } else {
         if(areAllVariationsSelected){
           addProduct({
@@ -336,6 +344,11 @@ const AddBtn: FC<AddBtnProps> = ({
             },
           });
           pixelEvent.event = "addToWishlist";
+          dataLayerEvent = {
+            event: 'add_to_wishlist',
+            productId,
+            title: product.productName,
+          };
         }else{
           const showErrorMessage = document.querySelector('.thefoschini-tfg-sku-selector-0-x-skuErrorMessage--tfg-sku-selector--unselected') as HTMLInputElement
           showErrorMessage.style.display = 'inline-block'
@@ -343,6 +356,7 @@ const AddBtn: FC<AddBtnProps> = ({
       }
 
       push(pixelEvent);
+      pushDatalayer(dataLayerEvent);
     } else {
       localStore.setItem("wishlist_addAfterLogin", String(productId));
       showLoginToast('Log in to save items to wishlist.')
