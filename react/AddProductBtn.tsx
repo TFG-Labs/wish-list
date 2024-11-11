@@ -328,8 +328,8 @@ const AddBtn: FC<AddBtnProps> = ({
         dataLayerEvent = {
           title: product.productName,
           eventLabel: "remove_from_wishlist",
-          eventAction: `productId: ${productId}}`,
-          eventDescription: "User removed productid from wishlist",
+          eventAction: `Removed from wishlist: ${productId}`,
+          eventDescription: "User removed an item from wishlist",
           eventCategory: "Wishlist_Event",
         };
       } else {
@@ -349,8 +349,8 @@ const AddBtn: FC<AddBtnProps> = ({
           dataLayerEvent = {
             title: product.productName,
             eventLabel: "add_to_wishlist",
-            eventAction: `productId: ${productId}}`,
-            eventDescription: "User added productid to wishlist",
+            eventAction: `Added to wishlist: ${productId}`,
+            eventDescription: "User added an item to wishlist",
             eventCategory: "Wishlist_Event",
           };
         }else{
