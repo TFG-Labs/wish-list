@@ -329,7 +329,7 @@ const AddBtn: FC<AddBtnProps> = ({
           title: product.productName,
           eventLabel: "remove_from_wishlist",
           eventAction: `productId: ${productId}}`,
-          eventDescription: "User removed productId from wishlist",
+          eventDescription: "User removed productid from wishlist",
           eventCategory: "Wishlist_Event",
         };
       } else {
@@ -350,7 +350,7 @@ const AddBtn: FC<AddBtnProps> = ({
             title: product.productName,
             eventLabel: "add_to_wishlist",
             eventAction: `productId: ${productId}}`,
-            eventDescription: "User added productId to wishlist",
+            eventDescription: "User added productid to wishlist",
             eventCategory: "Wishlist_Event",
           };
         }else{
