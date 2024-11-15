@@ -116,3 +116,7 @@ export function mapCatalogProductToProductSummary(
   }
   return normalizedProduct
 }
+
+export function pushDatalayer(e: any) {
+  (window as any).dataLayer?.push(e)
+}
